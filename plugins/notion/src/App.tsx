@@ -33,6 +33,13 @@ export function AuthenticatedApp({ context }: AppProps) {
         return <SelectDatabase onDatabaseSelected={setDatabaseConfig} />
     }
 
+<<<<<<< HEAD
+=======
+    if (synchronizeMutation.error) {
+        debugger
+    }
+
+>>>>>>> recover-semrush
     return (
         <MapDatabaseFields
             database={databaseConfig}
