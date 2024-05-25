@@ -1,8 +1,8 @@
 import { useState } from "react";
+import { useLocation } from "wouter";
 import { useValidateApiKeyMutation } from "../api";
 import { Button } from "../components/Button";
 import SemrushIcon from "../assets/icon.svg";
-import { useLocation } from "wouter";
 
 export function Setup() {
   const [, navigate] = useLocation();

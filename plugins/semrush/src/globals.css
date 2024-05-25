@@ -14,49 +14,50 @@
 }
 
 @layer components {
-  .row {
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-  }
+    .row {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
+    }
 
-  .col {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
+    .col {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
 
-  .row-lg {
-    display: flex;
-    flex-direction: row;
-    gap: 15px;
-  }
+    .row-lg {
+        display: flex;
+        flex-direction: row;
+        gap: 15px;
+    }
 
-  .col-lg {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
+    .col-lg {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
 
-  .framer-button-destructive {
-    background-color: theme(colors.framer-red);
-    box-shadow: 0 4px 8px 0 theme(colors.framer-red / 30%);
-    color: white;
-   }
+    .framer-button-destructive {
+        background-color: theme(colors.framer-red);
+        box-shadow: 0 4px 8px 0 theme(colors.framer-red / 30%);
+        color: white;
+    }
 
-   .framer-button-destructive:hover {
-    background-color: #e15;
-   }
+    .framer-button-destructive:hover {
+        background-color: #e15;
+    }
 
-  .input-container {
-    @apply row items-center justify-between pl-15;
-  }
+    .input-container {
+        @apply row items-center justify-between pl-15;
+    }
 }
 
 /* Reset */
 
 :root {
-    --framer-font-family: "Inter", system-ui, Avenir, Helvetica, Arial, sans-serif;
+    --framer-font-family: "Inter", system-ui, Avenir, Helvetica, Arial,
+        sans-serif;
 }
 
 *,
@@ -388,7 +389,6 @@ input::file-selector-button:hover {
     width: 100%;
     background-color: var(--framer-color-divider);
 }
-
 
 .framer-button-primary {
     color: var(--framer-color-text-reversed);

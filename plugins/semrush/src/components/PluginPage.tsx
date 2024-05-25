@@ -8,12 +8,7 @@ interface Props {
   isSmall?: boolean;
 }
 
-export const PluginContainer = ({
-  children,
-  title,
-  className,
-  isSmall,
-}: Props) => (
+export const PluginPage = ({ children, title, className, isSmall }: Props) => (
   <div
     className={cx(
       "flex flex-col h-fit min-w-[260px]",
