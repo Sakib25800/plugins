@@ -133,11 +133,10 @@ export function App() {
             setSize({ width: 260, height: 141 })
         }
 
-        async function handleCMSModes(
-            blogContext: BlogPluginContext,
-            hubContext: HubDBPluginContext,
-            isAuthenticated: boolean
-        ) {
+        async function handleCMSModes(isAuthenticated: boolean) {
+            const blogContext = await getBlogPluginContext()
+            const hubContext = await getHubDBPluginContext()
+
             setBlogPluginContext(blogContext)
             setHubDBPluginContext(hubContext)
 
@@ -188,10 +187,8 @@ export function App() {
             const isInCMSModes = mode === "syncManagedCollection" || mode === "configureManagedCollection"
 
             if (isInCMSModes) {
-                const blogContext = await getBlogPluginContext()
-                const hubContext = await getHubDBPluginContext()
-                await handleCMSModes(blogContext, hubContext, isAuthenticated)
-                return
+                await handleCMSModes(isAuthenticated)
+                return;
             }
 
             if (!isAuthenticated) {
