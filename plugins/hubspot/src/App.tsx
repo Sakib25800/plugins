@@ -142,8 +142,7 @@ export function App() {
             setHubDBPluginContext(hubContext)
 
             if (!isAuthenticated) {
-                handleNotAuthenticated()
-                return
+                return handleNotAuthenticated()
             }
 
             if (mode === "syncManagedCollection") {
@@ -188,13 +187,11 @@ export function App() {
             const isInCMSModes = mode === "syncManagedCollection" || mode === "configureManagedCollection"
 
             if (isInCMSModes) {
-                await handleCMSModes(isAuthenticated)
-                return
+                return handleCMSModes(isAuthenticated)
             }
 
             if (!isAuthenticated) {
-                handleNotAuthenticated()
-                return
+                return handleNotAuthenticated()
             }
 
             navigate("/canvas")
