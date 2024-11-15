@@ -297,7 +297,7 @@ async function cachedFetch<T>(queryKey: readonly unknown[], fetcher: () => Promi
 }
 
 export const fetchAllBlogPosts = (limit: number, properties: string[]) => {
-    return cachedFetch(queryKeys.blogPosts(limit, properties), () =>
+    return cachedFetch(["blog-posts", limit, properties], () =>
         request<HSQueryResult<HSBlogPost>>({
             path: "/cms/v3/blogs/posts",
             query: { limit, properties },
@@ -306,7 +306,7 @@ export const fetchAllBlogPosts = (limit: number, properties: string[]) => {
 }
 
 export const fetchPublishedTables = (limit: number) => {
-    return cachedFetch(queryKeys.publishedTables(limit), () =>
+    return cachedFetch(["hubdb-tables", limit], () =>
         request<HSQueryResult<HubDBTable>>({
             path: "/cms/v3/hubdb/tables",
             query: { limit },
@@ -315,7 +315,7 @@ export const fetchPublishedTables = (limit: number) => {
 }
 
 export const fetchPublishedTable = (tableId: string) => {
-    return cachedFetch(queryKeys.publishedTable(tableId), () =>
+    return cachedFetch(["hubdb-table", tableId], () =>
         request<HubDBTable>({
             path: `/cms/v3/hubdb/tables/${tableId}`,
         })
@@ -323,7 +323,7 @@ export const fetchPublishedTable = (tableId: string) => {
 }
 
 export const fetchTableRows = (tableId: string, properties: string[], limit: number) => {
-    return cachedFetch(queryKeys.tableRows(tableId, properties, limit), () =>
+    return cachedFetch(["hubdb-table-rows", tableId, properties, limit], () =>
         request<HSQueryResult<HubDBTableRow>>({
             path: `/cms/v3/hubdb/tables/${tableId}/rows`,
             query: { limit, properties },
@@ -333,22 +333,24 @@ export const fetchTableRows = (tableId: string, properties: string[], limit: num
 
 export const usePublishedTables = (limit: number) => {
     return useQuery({
-        queryKey: queryKeys.publishedTables(limit),
+        queryKey: ["hubdb-tables", limit],
         queryFn: () => fetchPublishedTables(limit),
         select: data => data.results,
+        staleTime: 0,
     })
 }
 
 export const usePublishedTable = (tableId: string) => {
     return useQuery({
-        queryKey: queryKeys.publishedTable(tableId),
+        queryKey: ["hubdb-table", tableId],
         queryFn: () => fetchPublishedTable(tableId),
+        staleTime: 0,
     })
 }
 
 export const useUserQuery = () => {
     return useQuery<HSUser>({
-        queryKey: queryKeys.user(),
+        queryKey: ["user"],
         queryFn: () => {
             const tokens = auth.tokens.getOrThrow()
 
@@ -362,7 +364,7 @@ export const useUserQuery = () => {
 
 export const useAccountQuery = () => {
     return useQuery<HSAccount>({
-        queryKey: queryKeys.account(),
+        queryKey: ["account"],
         queryFn: () => {
             return request({
                 method: "get",
@@ -374,7 +376,7 @@ export const useAccountQuery = () => {
 
 export const useInboxesQuery = () => {
     return useQuery<HSInboxesResponse, Error, HSInbox[]>({
-        queryKey: queryKeys.inboxes(),
+        queryKey: ["inboxes"],
         queryFn: () => {
             return request({
                 method: "GET",
@@ -387,7 +389,7 @@ export const useInboxesQuery = () => {
 
 export const useFormsQuery = () => {
     return useQuery<HSFormsResponse>({
-        queryKey: queryKeys.forms(),
+        queryKey: ["forms"],
         queryFn: () => {
             return request({
                 method: "get",
@@ -399,7 +401,7 @@ export const useFormsQuery = () => {
 
 export const useMeetingsQuery = () => {
     return useQuery<HSMeetingsResponse>({
-        queryKey: queryKeys.meetings(),
+        queryKey: ["meetings"],
         queryFn: () => {
             return request({
                 method: "get",
