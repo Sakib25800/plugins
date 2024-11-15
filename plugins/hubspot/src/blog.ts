@@ -10,12 +10,15 @@ export interface SyncBlogParams {
     includedFieldIds: string[]
 }
 
-export interface ProcessPostParams {
+export interface ProcessBlogParams {
     fields: ManagedCollectionField[]
-    post: HSBlogPost
     fieldsById: FieldsById
-    status: SyncStatus
     unsyncedItemIds: Set<string>
+}
+
+export interface ProcessPostParams extends ProcessBlogParams {
+    post: HSBlogPost
+    status: SyncStatus
 }
 
 export interface BlogPluginContextNew {
@@ -112,7 +115,7 @@ function processPost({ post, fieldsById, unsyncedItemIds, status }: ProcessPostP
     }
 }
 
-function processBlog(posts: HSBlogPost[], processBlogParams: Omit<ProcessPostParams, "post" | "status">) {
+function processBlog(posts: HSBlogPost[], processBlogParams: ProcessBlogParams) {
     const seenItemIds = new Set<string>()
     const status: SyncStatus = {
         info: [],
