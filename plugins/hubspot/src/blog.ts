@@ -1,6 +1,6 @@
 import { framer, ManagedCollection, ManagedCollectionField } from "framer-plugin"
 import { fetchAllBlogPosts, HSBlogPost } from "./api"
-import { isDefined, parseJsonToArray } from "./utils"
+import { assert, isDefined, parseJsonToArray } from "./utils"
 import { FieldsById, logSyncResult, MAX_CMS_ITEMS, richTextToHTML, SyncResult, SyncStatus } from "./cms"
 
 export const PLUGIN_INCLUDED_FIELD_IDS = "hubspotPluginBlogIncludedFieldIds"
@@ -68,7 +68,7 @@ function processPost({ post, fieldsById, unsyncedItemIds, status }: ProcessPostP
 
     for (const [propertyName, propertyValue] of Object.entries(post)) {
         if (propertyName === "slug") {
-            if (typeof propertyValue !== "string") continue
+            assert(typeof propertyValue === "string", "Expected 'slug' to be a string")
 
             slugValue = propertyValue
         }
