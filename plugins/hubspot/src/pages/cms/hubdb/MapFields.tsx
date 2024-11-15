@@ -74,9 +74,10 @@ const getFieldNameOverrides = (pluginContext: HubDBPluginContext): Record<string
 export default function MapHubDBFieldsPage({ hubDBPluginContext }: PageProps) {
     useLoggingToggle()
 
-    const [{ tableId }] = useSearchParams<{ tableId: string }>()
-    const { data: table, isLoading: isLoadingTable } = usePublishedTable(tableId)
+    const searchParams = useSearchParams()
+    const tableId = searchParams.get("tableId")
 
+    const { data: table, isLoading: isLoadingTable } = usePublishedTable(tableId || "")
     const slugFields = useMemo(() => getPossibleSlugFields(table?.columns || []), [table])
     const [slugFieldName, setSlugFieldName] = useState<string | null>(null)
     const [collectionFieldConfig, setCollectionFieldConfig] = useState<ManagedCollectionFieldConfig[]>([])
@@ -139,6 +140,7 @@ export default function MapHubDBFieldsPage({ hubDBPluginContext }: PageProps) {
             })
 
         assert(slugFieldName)
+        assert(tableId)
 
         sync({
             fields: allFields,
@@ -149,6 +151,8 @@ export default function MapHubDBFieldsPage({ hubDBPluginContext }: PageProps) {
     }
 
     if (isLoadingTable) return <CenteredSpinner className="w-[340px] h-[446px]" size="medium" />
+
+    if (!tableId) return <div>Expected `tableId` query param</div>
 
     return (
         <form onSubmit={handleSubmit} className="col gap-2.5 flex-1 text-tertiary w-[340px] px-[15px] pt-[15px]">
