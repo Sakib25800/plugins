@@ -147,7 +147,7 @@ export function App() {
             if (mode === "syncManagedCollection") {
                 if (shouldSyncBlogImmediately(blogContext)) {
                     return syncBlogs({
-                        includedFieldIds: blogContext.includedFieldIds,
+                        excludedFieldIds: blogContext.excludedFieldIds,
                         fields: blogContext.collectionFields,
                     }).then(() => framer.closePlugin("Synchronization successful"))
                 }

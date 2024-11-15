@@ -3,11 +3,11 @@ import { fetchAllBlogPosts, HSBlogPost } from "./api"
 import { assert, isDefined, parseJsonToArray } from "./utils"
 import { FieldsById, logSyncResult, MAX_CMS_ITEMS, richTextToHTML, SyncResult, SyncStatus } from "./cms"
 
-export const PLUGIN_INCLUDED_FIELD_IDS = "hubspotPluginBlogIncludedFieldIds"
+export const PLUGIN_EXCLUDED_FIELD_IDS = "hubspotPluginBlogExcludedFieldIds"
 
 export interface SyncBlogParams {
     fields: ManagedCollectionField[]
-    includedFieldIds: string[]
+    excludedFieldIds: string[]
 }
 
 export interface ProcessBlogParams {
@@ -30,7 +30,7 @@ export interface BlogPluginContextUpdate {
     type: "update"
     collection: ManagedCollection
     collectionFields: ManagedCollectionField[]
-    includedFieldIds: string[]
+    excludedFieldIds: string[]
 }
 
 export type BlogPluginContext = BlogPluginContextNew | BlogPluginContextUpdate
@@ -45,10 +45,10 @@ export async function getBlogPluginContext(): Promise<BlogPluginContext> {
     const collection = await framer.getManagedCollection()
     const collectionFields = await collection.getFields()
 
-    const rawIncludedFields = await collection.getPluginData(PLUGIN_INCLUDED_FIELD_IDS)
-    const includedFieldIds = parseJsonToArray<string>(rawIncludedFields)
+    const rawExcludedFieldIds = await collection.getPluginData(PLUGIN_EXCLUDED_FIELD_IDS)
+    const excludedFieldIds = parseJsonToArray<string>(rawExcludedFieldIds)
 
-    if (!includedFieldIds) {
+    if (!excludedFieldIds) {
         return {
             type: "new",
             collection,
@@ -59,7 +59,7 @@ export async function getBlogPluginContext(): Promise<BlogPluginContext> {
         type: "update",
         collection,
         collectionFields,
-        includedFieldIds,
+        excludedFieldIds,
     }
 }
 
@@ -132,12 +132,13 @@ function processBlog(posts: HSBlogPost[], processBlogParams: ProcessBlogParams) 
     }
 }
 
-export async function syncBlogs({ fields, includedFieldIds }: SyncBlogParams) {
+export async function syncBlogs({ fields, excludedFieldIds }: SyncBlogParams) {
     const collection = await framer.getManagedCollection()
     await collection.setFields(fields)
 
     const fieldsById = new Map(fields.map(field => [field.id, field]))
     const unsyncedItemIds = new Set(await collection.getItemIds())
+    const includedFieldIds = fields.map(field => field.id).filter(id => !excludedFieldIds.includes(id))
     // We need the ID, so include it regardless. We don't include slug explicitly since it's always included.
     // Included field Ids are also the names of the HubSpot blog field properties since field names are unique.
     const { results: posts } = await fetchAllBlogPosts(MAX_CMS_ITEMS, Array.from(new Set([...includedFieldIds, "id"])))
@@ -152,7 +153,7 @@ export async function syncBlogs({ fields, includedFieldIds }: SyncBlogParams) {
     const itemsToDelete = Array.from(unsyncedItemIds)
     await collection.removeItems(itemsToDelete)
 
-    await collection.setPluginData(PLUGIN_INCLUDED_FIELD_IDS, JSON.stringify(Array.from(includedFieldIds)))
+    await collection.setPluginData(PLUGIN_EXCLUDED_FIELD_IDS, JSON.stringify(Array.from(excludedFieldIds)))
 
     const result: SyncResult = {
         status: status.errors.length === 0 ? "success" : "completed_with_errors",

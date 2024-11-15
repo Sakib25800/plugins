@@ -19,7 +19,7 @@ interface ManagedCollectionFieldConfig {
 export default function Blog({ blogPluginContext }: PageProps) {
     useLoggingToggle()
     const [isSyncing, setIsSyncing] = useState(false)
-    const [includedFieldIds, setIncludedFieldIds] = useState<Set<string>>(new Set())
+    const [excludedFieldIds, setExcludedFieldIds] = useState<Set<string>>(new Set())
     const [collectionFieldConfig, setCollectionFieldConfig] = useState<ManagedCollectionFieldConfig[]>([])
     const [fieldNameOverrides, setFieldNameOverrides] = useState<Record<string, string>>({})
 
@@ -35,19 +35,15 @@ export default function Blog({ blogPluginContext }: PageProps) {
             blogPluginContext.type === "update"
                 ? Object.fromEntries(blogPluginContext.collectionFields.map(field => [field.id, field.name]))
                 : {}
-        const includedFields = new Set(
-            blogPluginContext.type === "update"
-                ? blogPluginContext.includedFieldIds
-                : HUBSPOT_BLOG_FIELDS.map(field => field.id)
-        )
+        const excludedFields = new Set(blogPluginContext.type === "update" ? blogPluginContext.excludedFieldIds : [])
 
-        setIncludedFieldIds(includedFields)
+        setExcludedFieldIds(excludedFields)
         setCollectionFieldConfig(colFieldConfig)
         setFieldNameOverrides(nameOverrides)
     }, [blogPluginContext])
 
     const handleFieldToggle = (fieldId: string) => {
-        setIncludedFieldIds(current => {
+        setExcludedFieldIds(current => {
             const nextSet = new Set(current)
             if (nextSet.has(fieldId)) {
                 nextSet.delete(fieldId)
@@ -71,7 +67,7 @@ export default function Blog({ blogPluginContext }: PageProps) {
         setIsSyncing(true)
 
         const allFields = collectionFieldConfig
-            .filter(fieldConfig => fieldConfig.field && includedFieldIds.has(fieldConfig.field.id))
+            .filter(fieldConfig => fieldConfig.field && !excludedFieldIds.has(fieldConfig.field.id))
             .map(fieldConfig => fieldConfig.field)
             .filter(isDefined)
             .map(field => {
@@ -82,7 +78,7 @@ export default function Blog({ blogPluginContext }: PageProps) {
                 return field
             })
 
-        syncBlogs({ includedFieldIds: Array.from(includedFieldIds), fields: allFields }).then(() =>
+        syncBlogs({ excludedFieldIds: Array.from(excludedFieldIds), fields: allFields }).then(() =>
             framer.closePlugin("Synchronization successful")
         )
     }
@@ -100,7 +96,7 @@ export default function Blog({ blogPluginContext }: PageProps) {
                             <CheckboxTextfield
                                 value={capitalize(fieldConfig.originalFieldName)}
                                 disabled={!fieldConfig.field}
-                                checked={!!fieldConfig.field && includedFieldIds.has(fieldConfig.field.id)}
+                                checked={!!fieldConfig.field && !excludedFieldIds.has(fieldConfig.field.id)}
                                 onChange={() => {
                                     assert(fieldConfig.field)
 
@@ -111,7 +107,7 @@ export default function Blog({ blogPluginContext }: PageProps) {
                             <input
                                 type="text"
                                 className={classNames("w-full", { "opacity-50": isUnsupported })}
-                                disabled={!fieldConfig.field || !includedFieldIds.has(fieldConfig.field.id)}
+                                disabled={!fieldConfig.field || excludedFieldIds.has(fieldConfig.field.id)}
                                 placeholder={fieldConfig.originalFieldName}
                                 value={
                                     !fieldConfig.field
