@@ -134,6 +134,7 @@ export function App() {
         }
 
         async function handleCMSModes(isAuthenticated: boolean) {
+            const mode = framer.mode
             const blogContext = await getBlogPluginContext()
             const hubContext = await getHubDBPluginContext()
 
@@ -144,26 +145,23 @@ export function App() {
                 return handleNotAuthenticated()
             }
 
-            if (mode === "syncManagedCollection") {
-                if (shouldSyncBlogImmediately(blogContext)) {
-                    return syncBlogs({
-                        excludedFieldIds: blogContext.excludedFieldIds,
-                        fields: blogContext.collectionFields,
-                    }).then(() => framer.closePlugin("Synchronization successful"))
-                }
+            const shouldSyncBlog = mode === "syncManagedCollection" && shouldSyncBlogImmediately(blogContext)
+            const shouldSyncHubDB = mode === "syncManagedCollection" && shouldSyncHubDBImmediately(hubContext)
 
-                if (shouldSyncHubDBImmediately(hubContext)) {
-                    return syncHubDBTable({
-                        tableId: hubContext.tableId,
-                        fields: hubContext.collectionFields,
-                        slugFieldName: hubContext.slugFieldName,
-                        includedFieldNames: hubContext.includedFieldNames,
-                    }).then(() => framer.closePlugin("Synchronization successful"))
-                }
+            if (shouldSyncBlog) {
+                return syncBlogs({
+                    excludedFieldIds: blogContext.excludedFieldIds,
+                    fields: blogContext.collectionFields,
+                }).then(() => framer.closePlugin("Synchronization successful"))
+            }
 
-                handleNewCollection()
-
-                return
+            if (shouldSyncHubDB) {
+                return syncHubDBTable({
+                    tableId: hubContext.tableId,
+                    fields: hubContext.collectionFields,
+                    slugFieldName: hubContext.slugFieldName,
+                    includedFieldNames: hubContext.includedFieldNames,
+                }).then(() => framer.closePlugin("Synchronization successful"))
             }
 
             if (blogContext.type === "update") {
