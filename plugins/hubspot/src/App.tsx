@@ -125,6 +125,7 @@ export function App() {
         const mode = framer.mode
 
         const handleNotAuthenticated = () => {
+            navigate("/")
             setSize({ width: 260, height: 315 })
         }
 
@@ -188,7 +189,7 @@ export function App() {
 
             if (isInCMSModes) {
                 await handleCMSModes(isAuthenticated)
-                return;
+                return
             }
 
             if (!isAuthenticated) {
