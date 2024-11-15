@@ -13,7 +13,6 @@ import {
 import { FieldsById, MAX_CMS_ITEMS, richTextToHTML, slugify, logSyncResult, SyncResult, SyncStatus } from "./cms"
 import { isDefined, parseJsonToArray } from "./utils"
 import { useMutation } from "@tanstack/react-query"
-import { HUBSPOT_FILE_TYPES } from "./constants"
 
 const PLUGIN_TABLE_ID_KEY = "hubdbTableId"
 const PLUGIN_INCLUDED_FIELD_NAMES_KEY = "hubdbIncludedFieldNames"
@@ -137,10 +136,10 @@ export function getCollectionFieldForHubDBColumn(column: HubDBColumn): ManagedCo
             return { ...fieldMetadata, type: "image" }
 
         case "VIDEO":
-            return { ...fieldMetadata, type: "file", allowedFileTypes: HUBSPOT_FILE_TYPES }
+            return { ...fieldMetadata, type: "file", allowedFileTypes: [] }
 
         case "FILE":
-            return { ...fieldMetadata, type: "file", allowedFileTypes: HUBSPOT_FILE_TYPES }
+            return { ...fieldMetadata, type: "file", allowedFileTypes: [] }
 
         case "SELECT": {
             const cases = column.options?.map(opt => ({ name: opt.label, id: opt.name }))
