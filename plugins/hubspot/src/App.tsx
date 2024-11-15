@@ -112,7 +112,6 @@ export function App() {
     })
 
     useEffect(() => {
-        console.log(width, height)
         if (!width || !height) return
         framer.showUI({
             position: "top right",
